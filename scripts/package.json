@@ -1,0 +1,18 @@
+{
+  "name": "seed-script",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "seed": "tsx seedData.ts",
+    "clear-reseed": "tsx seedData.ts"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.2"
+  }
+}
