@@ -18,12 +18,14 @@ import { formatCurrency } from '../lib/statsCalculator';
 const CHART_HEIGHT = 360;
 
 function getClosestLineToCursor(
-  payload: Array<{ dataKey: string; value?: number }>,
+  payload: Array<{ dataKey?: string | number; value?: unknown }>,
   coordinate: { x?: number; y?: number } | undefined,
   chartHeight: number
 ): string | null {
   if (!payload?.length || !coordinate || coordinate.y == null) return null;
-  const validPayload = payload.filter((p) => p.value != null && typeof p.value === 'number');
+  const validPayload = payload.filter(
+    (p) => p.dataKey != null && p.value != null && typeof p.value === 'number'
+  );
   if (validPayload.length === 0) return null;
   const values = validPayload.map((p) => Number(p.value));
   const minVal = Math.min(...values);
@@ -39,14 +41,14 @@ function getClosestLineToCursor(
       closest = p;
     }
   }
-  return closest.dataKey as string;
+  return String(closest.dataKey ?? '');
 }
 
 interface ClosestLineTooltipProps {
   active?: boolean;
-  payload?: Array<{ dataKey: string; value?: number; color?: string }>;
+  payload?: Array<{ dataKey?: string | number; value?: unknown; color?: string }>;
   label?: string;
-  coordinate?: { x: number; y: number };
+  coordinate?: { x?: number; y?: number };
   setActiveLine: (name: string | null) => void;
   chartHeight: number;
 }
@@ -70,13 +72,13 @@ function ClosestLineTooltip({
 
   if (!active || !payload?.length) return null;
   const closest = getClosestLineToCursor(payload, coordinate, chartHeight);
-  const p = payload.find((item) => item.dataKey === closest);
+  const p = payload.find((item) => String(item.dataKey) === closest);
   if (!p || p.value == null) return null;
   return (
     <div className="rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-200">
       <div className="mb-1 text-gray-400">{label}</div>
       <div className="flex items-center justify-between gap-3">
-        <span style={{ color: p.color }}>{p.dataKey}</span>
+        <span style={{ color: p.color }}>{String(p.dataKey)}</span>
         <span>{formatCurrency(Number(p.value) * 100)}</span>
       </div>
     </div>
@@ -180,7 +182,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
               contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
               content={(props) => (
                 <ClosestLineTooltip
-                  {...props}
+                  {...(props as ClosestLineTooltipProps)}
                   setActiveLine={setActiveLineCumulative}
                   chartHeight={CHART_HEIGHT}
                 />
@@ -218,7 +220,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
               contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
               content={(props) => (
                 <ClosestLineTooltip
-                  {...props}
+                  {...(props as ClosestLineTooltipProps)}
                   setActiveLine={setActiveLineAverage}
                   chartHeight={CHART_HEIGHT}
                 />
@@ -274,7 +276,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
               formatter={(value: number) => formatCurrency(value * 100)}
             />
             <Bar dataKey="total" fill="#60a5fa">
-              {playerTotalsData.map((entry, index) => (
+              {playerTotalsData.map((entry) => (
                 <Cell key={entry.player} fill={entry.total >= 0 ? '#34d399' : '#f87171'} />
               ))}
             </Bar>

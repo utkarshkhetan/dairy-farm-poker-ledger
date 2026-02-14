@@ -66,7 +66,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
         return;
       }
 
-      // Extract date from first row (all should have same date)
+      // Extract date from first row's session_start_at timestamp
       const gameDate = extractDateFromTimestamp(rows[0].session_start_at);
       const displayDate = formatDisplayDate(gameDate);
 
