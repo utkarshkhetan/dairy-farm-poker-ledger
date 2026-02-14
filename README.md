@@ -12,7 +12,7 @@ A modern, dark-themed poker ledger website for tracking game history, statistics
   - Win/loss distribution charts
   - Cumulative profit/loss over time
 - 📋 **Game Log** - View detailed results for any game by date
-- 🔐 **Admin Upload** - Secure CSV upload for new games (secret code: `milkdaddy`)
+- 🔐 **Admin Upload** - Secure CSV upload for new games
 - 🎨 **Dark Mode UI** - Modern, sleek dark theme
 
 ## Tech Stack
@@ -128,9 +128,10 @@ npm run build
 To upload a new game:
 
 1. Click the subtle "Admin" button in the bottom-right corner
-2. Enter the secret code: `milkdaddy`
+2. Enter the secret code
 3. Upload a CSV file in the format of `ledger_pglea_*.csv`
 4. The system will:
+   - Extract the game date from the `session_start_at` timestamp in the CSV
    - Check for duplicate dates
    - Auto-match players by `player_id` or `nickname`
    - Prompt for manual matching if needed
