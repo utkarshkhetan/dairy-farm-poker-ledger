@@ -233,9 +233,9 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     return (
       <button
         onClick={() => setShowCodeInput(true)}
-        className="fixed bottom-4 right-4 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+        className="px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg shadow-lg hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-colors"
       >
-        Admin
+        Admin (Ledger Upload)
       </button>
     );
   }
@@ -250,7 +250,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
               type="password"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Secret code"
+              placeholder="Enter password"
               className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               autoFocus
             />

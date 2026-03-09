@@ -123,6 +123,17 @@ export function Dashboard() {
           <LifetimeStandings standings={lifetimeStandings} />
         </div>
 
+        {/* Hot & Cold Streaks + Game Log */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
+          <div className="lg:col-span-6">
+            <TrendingSection players={players} games={games} />
+          </div>
+          <div className="lg:col-span-6">
+            <GameLog games={games} players={players} />
+          </div>
+        </div>
+
+        {/* Charts + Fun Statistics */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
           <div className="lg:col-span-7">
             <ChartsSection players={players} games={games} />
@@ -132,18 +143,11 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
-          <div className="lg:col-span-6">
-            <TrendingSection players={players} games={games} />
-          </div>
-          <div className="lg:col-span-6">
-            <GameLog games={games} players={players} />
-          </div>
-        </div>
+        {/* Admin (Ledger Upload) */}
+        <section className="mt-8 pt-6 border-t border-gray-700 flex justify-center">
+          <AdminUpload onUploadComplete={() => {}} />
+        </section>
       </div>
-
-      {/* Admin Upload */}
-      <AdminUpload onUploadComplete={() => {}} />
     </div>
   );
 }

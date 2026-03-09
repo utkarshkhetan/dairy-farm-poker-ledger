@@ -17,11 +17,11 @@ export function calculatePlayerStats(
   const wins = results.filter(r => r > 0).length;
   const winPercentage = gamesPlayed > 0 ? (wins / gamesPlayed) * 100 : 0;
   
-  // Standard deviation of per-game results (population: divide by n, not n-1)
+  // Population standard deviation of per-game results (cents): σ = sqrt(Σ(x_i - μ)² / n)
   const mean = averagePerGame;
   const variance =
     gamesPlayed > 0
-      ? results.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / gamesPlayed
+      ? results.reduce((sum, val) => sum + (val - mean) ** 2, 0) / gamesPlayed
       : 0;
   const standardDeviation = Math.sqrt(variance);
   

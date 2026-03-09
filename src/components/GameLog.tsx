@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Game, Player } from '../types';
 import { formatCurrency, getFirstName } from '../lib/statsCalculator';
 import { PlayerLink } from './PlayerLink';
@@ -8,8 +8,21 @@ interface GameLogProps {
   players: Player[];
 }
 
+function getMostRecentGameDate(games: Game[]): string {
+  if (games.length === 0) return '';
+  const sorted = [...games].sort((a, b) => b.date.localeCompare(a.date));
+  return sorted[0].date;
+}
+
 export function GameLog({ games, players }: GameLogProps) {
+  const mostRecentDate = getMostRecentGameDate(games);
   const [selectedDate, setSelectedDate] = useState<string>('');
+
+  useEffect(() => {
+    if (mostRecentDate && !selectedDate) {
+      setSelectedDate(mostRecentDate);
+    }
+  }, [mostRecentDate, selectedDate]);
 
   const selectedGame = games.find(g => g.date === selectedDate);
 
@@ -40,7 +53,7 @@ export function GameLog({ games, players }: GameLogProps) {
             id="game-select"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-1.5 text-sm bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="min-w-[180px] px-4 py-2.5 text-base bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">-- Select a game --</option>
             {games.map((game) => (

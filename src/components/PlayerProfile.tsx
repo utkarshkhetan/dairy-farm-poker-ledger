@@ -188,9 +188,9 @@ export function PlayerProfile() {
                 <div
                   className={`text-lg font-bold capitalize ${
                     stat.recentTrend === 'hot'
-                      ? 'text-green-400'
+                      ? 'text-red-500'
                       : stat.recentTrend === 'cold'
-                        ? 'text-red-400'
+                        ? 'text-blue-400'
                         : 'text-gray-400'
                   }`}
                 >
