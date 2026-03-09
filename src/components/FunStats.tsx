@@ -9,7 +9,7 @@ interface FunStatsProps {
 
 export function FunStats({ stats, players }: FunStatsProps) {
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 h-full">
+    <div className="bg-gray-800/75 rounded-xl p-6 border border-gray-700 h-full">
       <h2 className="text-2xl font-bold text-white mb-4">🎲 Fun Statistics</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {stats.map((stat, index) => {

@@ -50,7 +50,7 @@ export function Dashboard() {
             <p className="text-red-400 font-semibold mb-2">Firestore Error</p>
             <p className="text-gray-300 text-sm">{error}</p>
           </div>
-          <div className="text-left bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="text-left bg-gray-800/75 rounded-lg p-6 border border-gray-700">
             <p className="text-white font-semibold mb-2">Troubleshooting:</p>
             <ol className="text-gray-400 text-sm space-y-2 list-decimal list-inside">
               <li>Check Firebase Console → Firestore Database → Data tab to verify data exists</li>
@@ -75,7 +75,7 @@ export function Dashboard() {
           <p className="text-gray-400 text-lg mb-4">
             No data found in Firestore.
           </p>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-left">
+          <div className="bg-gray-800/75 rounded-lg p-6 border border-gray-700 text-left">
             <p className="text-white font-semibold mb-2">To import data:</p>
             <ol className="text-gray-400 text-sm space-y-2 list-decimal list-inside">
               <li>Make sure the Admin SDK key file is in the project root</li>

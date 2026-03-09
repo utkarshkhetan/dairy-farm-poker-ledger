@@ -53,7 +53,7 @@ export function LifetimeStandings({ standings }: LifetimeStandingsProps) {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
+    <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-xl font-bold text-white">🏆 Lifetime Standings</h2>
         <div className="text-xs text-gray-400">Total | Avg / Game</div>

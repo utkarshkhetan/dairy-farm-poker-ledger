@@ -239,7 +239,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     return (
       <button
         onClick={() => setShowCodeInput(true)}
-        className="px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg shadow-lg hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-colors"
+        className="px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800/90 border border-gray-600 rounded-lg shadow-lg hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-colors"
       >
         Admin (Ledger Upload)
       </button>
@@ -249,7 +249,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
   if (showCodeInput && !unlocked) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
+        <div className="bg-gray-800/90 rounded-xl p-8 border border-gray-700">
           <h2 className="text-2xl font-bold text-white mb-4">Enter Admin Code</h2>
           <form onSubmit={handleCodeSubmit}>
             <input
@@ -310,7 +310,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
   if (unlocked && adminView === 'menu') {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 max-w-sm w-full">
+        <div className="bg-gray-800/90 rounded-xl p-8 border border-gray-700 max-w-sm w-full">
           <h2 className="text-2xl font-bold text-white mb-6">Admin</h2>
           <div className="flex flex-col gap-3">
             <button
@@ -353,7 +353,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     const uniqueSessions = new Set(visits.map((v) => v.sessionId)).size;
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 max-w-4xl w-full max-h-[90vh] flex flex-col">
+        <div className="bg-gray-800/90 rounded-xl p-6 border border-gray-700 max-w-4xl w-full max-h-[90vh] flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-white">Site analytics</h2>
             <div className="flex gap-2">
@@ -424,7 +424,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
   if (unlocked && adminView === 'upload') {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 max-w-md w-full">
+        <div className="bg-gray-800/90 rounded-xl p-8 border border-gray-700 max-w-md w-full">
           <h2 className="text-2xl font-bold text-white mb-4">Upload Game Data</h2>
 
           {success ? (

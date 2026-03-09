@@ -268,7 +268,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
   }, [players, games, barRange]);
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+    <div className="bg-gray-800/75 rounded-xl p-6 border border-gray-700">
       <h2 className="text-2xl font-bold text-white mb-4">📈 Profit/Loss Over Time</h2>
       <div
         ref={cumulativeContainerRef}

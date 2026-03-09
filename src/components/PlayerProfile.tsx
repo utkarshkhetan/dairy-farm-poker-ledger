@@ -143,7 +143,7 @@ export function PlayerProfile() {
 
         {/* Core stats */}
         {stat && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-white mb-4">📊 Key statistics</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               <div className="bg-gray-900/70 rounded-lg p-4 border border-gray-700">
@@ -202,7 +202,7 @@ export function PlayerProfile() {
         )}
 
         {/* Streaks */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+        <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
           <h2 className="text-xl font-bold text-white mb-4">🔥 Streaks</h2>
           <div className="flex flex-wrap gap-4">
             <div className="bg-gray-900/70 rounded-lg px-4 py-3 border border-gray-700">
@@ -222,7 +222,7 @@ export function PlayerProfile() {
 
         {/* Fun stats they hold */}
         {myFunStats.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-white mb-4">🎲 Fun stats</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {myFunStats.map((f, i) => (
@@ -241,7 +241,7 @@ export function PlayerProfile() {
 
         {/* Cumulative P/L chart */}
         {cumulativeChartData.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-white mb-4">📈 Cumulative profit/loss over time</h2>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={cumulativeChartData}>
@@ -267,7 +267,7 @@ export function PlayerProfile() {
 
         {/* Played with */}
         {opponents.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-white mb-4">👥 Played with</h2>
             <p className="text-gray-400 text-sm mb-3">
               {opponents.length} distinct opponent{opponents.length !== 1 ? 's' : ''} in games you played.
@@ -286,7 +286,7 @@ export function PlayerProfile() {
 
         {/* Recent form */}
         {playerGames.length > 0 && (
-          <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-6">
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-white mb-4">📋 Recent form (last 10 games)</h2>
             <div className="space-y-2">
               {playerGames.slice(0, 10).map(({ game, cents, position }) => (
@@ -312,11 +312,11 @@ export function PlayerProfile() {
         )}
 
         {/* Full game history */}
-        <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
+        <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700">
           <h2 className="text-xl font-bold text-white mb-4">📋 Full game history</h2>
           <div className="max-h-[400px] overflow-y-auto">
             <table className="w-full text-left text-sm">
-              <thead className="sticky top-0 bg-gray-800 border-b border-gray-700">
+              <thead className="sticky top-0 bg-gray-800/75 border-b border-gray-700">
                 <tr>
                   <th className="py-2 pr-4 text-gray-400 font-medium">Date</th>
                   <th className="py-2 pr-4 text-gray-400 font-medium">Position</th>

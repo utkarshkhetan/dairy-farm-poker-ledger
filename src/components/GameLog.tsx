@@ -44,7 +44,7 @@ export function GameLog({ games, players }: GameLogProps) {
   const rightColumn = playerResults.slice(mid);
 
   return (
-    <div className="bg-gray-800 rounded-xl p-5 border border-gray-700">
+    <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="text-xl font-bold text-white">📋 Game Log</h2>
         <div>
