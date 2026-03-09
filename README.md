@@ -131,12 +131,18 @@ To upload a new game:
 2. Enter the secret code
 3. Upload a CSV file in the format of `ledger_pglea_*.csv`
 4. The system will:
-   - Extract the game date from the `session_start_at` timestamp in the CSV
+   - Extract the game date from **game start** (`session_start_at` only, never `session_end_at`), converted to PST (UTC−8)
    - Check for duplicate dates
    - Auto-match players by `player_id` or `nickname`
    - Prompt for manual matching if needed
    - Aggregate re-buys (multiple rows for same player)
    - Save the game to Firestore
+
+## Scripts (from `scripts/`)
+
+- `npm run seed` – Clear and reseed from `Cal Dairy Farm - All Games.csv`
+- `npm run revert [date] [playerName]` – Delete a game by date and optionally a player (e.g. `npm run revert 2026-02-03 John`)
+- `npm run migrate-dates` – Subtract 1 day from all game dates (PST evening correction)
 
 ## Known Player IDs
 
@@ -157,7 +163,9 @@ The following player IDs are pre-configured for automatic matching:
 │   ├── types/          # TypeScript type definitions
 │   └── ...
 ├── scripts/
-│   └── seedData.ts     # Initial data import script
+│   ├── seedData.ts       # Initial data import script
+│   ├── revertUpload.ts   # Revert a specific upload
+│   └── migrateDatesToPST.ts  # Migrate dates for PST
 └── ...
 ```
 

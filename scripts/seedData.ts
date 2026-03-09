@@ -43,14 +43,16 @@ const NICKNAME_MAPPINGS: Record<string, string> = {
   Hoot: 'Hoot',
 };
 
-// Columns to skip when parsing game dates (Player, Totals, Num Games Played, Per Game)
-const SKIP_HEADERS = ['Player', 'Totals', 'Num Games Played', 'Per Game'];
+/** Only columns like "11/20" or "1/14 -1" are game-date columns */
+const DATE_COLUMN_REGEX = /^\d{1,2}\/\d{1,2}( -1)?$/;
 
 interface CSVRow {
   Player: string;
-  Totals: string;
+  'Totals ($)'?: string;
+  'Totals (BB)'?: string;
   'Num Games Played'?: string;
-  'Per Game'?: string;
+  'Per Game ($)'?: string;
+  'Per Game (BB)'?: string;
   [key: string]: string | undefined;
 }
 
@@ -65,6 +67,18 @@ function parseDate(dateStr: string, baseYear: number): string {
 function formatDisplayDate(dateStr: string): string {
   const [, m, d] = dateStr.split('-').map(Number);
   return `${m}/${d}`;
+}
+
+function resolveUniqueGameDate(
+  dateStr: string,
+  baseYear: number,
+  seenDates: Map<string, number>
+): string {
+  const baseDate = parseDate(dateStr, baseYear);
+  const nextCount = (seenDates.get(baseDate) ?? 0) + 1;
+  seenDates.set(baseDate, nextCount);
+  if (nextCount === 1) return baseDate;
+  return `${baseDate}-${nextCount}`;
 }
 
 async function clearAllData() {
@@ -95,15 +109,12 @@ async function seedData() {
       skipEmptyLines: true,
     });
 
-    const rows = parsed.data.filter((row) => row.Player && row.Player.trim() !== '');
+    const rows = parsed.data.filter(
+      (row) => row.Player && row.Player.trim() !== '' && row.Player.trim() !== 'BB'
+    );
 
-    const gameDates: string[] = [];
     const headers = Object.keys(rows[0] || {});
-    for (const header of headers) {
-      if (!SKIP_HEADERS.includes(header)) {
-        gameDates.push(header);
-      }
-    }
+    const gameDates = headers.filter((h) => DATE_COLUMN_REGEX.test(h));
 
     const playersMap = new Map<
       string,
@@ -140,19 +151,13 @@ async function seedData() {
 
     const baseYear = 2024;
     const gamesCreated: string[] = [];
+    const seenDates = new Map<string, number>();
 
     for (const dateStr of gameDates) {
       try {
         const gameDate = parseDate(dateStr, baseYear);
         const displayDate = formatDisplayDate(gameDate);
-
-        let finalDate = gameDate;
-        if (dateStr.includes(' -1')) {
-          const hasExisting = gamesCreated.some((d) => d.startsWith(gameDate));
-          if (hasExisting) {
-            finalDate = gameDate + '-2';
-          }
-        }
+        const finalDate = resolveUniqueGameDate(dateStr, baseYear, seenDates);
 
         const results: Record<string, number> = {};
 

@@ -92,6 +92,16 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
   const averageContainerRef = useRef<HTMLDivElement>(null);
   const getGameDate = (dateStr: string) => new Date(`${dateStr.slice(0, 10)}T00:00:00`);
 
+  const playersWithEnoughGames = useMemo(() => {
+    const gameCount: Record<string, number> = {};
+    for (const game of games) {
+      for (const playerId of Object.keys(game.results)) {
+        gameCount[playerId] = (gameCount[playerId] ?? 0) + 1;
+      }
+    }
+    return players.filter((p) => (gameCount[p.id] ?? 0) >= 3);
+  }, [players, games]);
+
   useEffect(() => {
     const el = cumulativeContainerRef.current;
     if (!el) return;
@@ -130,13 +140,13 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
 
     for (const game of sortedGames) {
       const entry: Record<string, any> = { date: game.displayDate };
-      
+
       for (const player of players) {
         const result = game.results[player.id] || 0;
         cumulative[player.id] = (cumulative[player.id] || 0) + result;
         entry[player.name] = cumulative[player.id] / 100; // Convert to dollars
       }
-      
+
       data.push(entry);
     }
 
@@ -151,50 +161,52 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
 
     for (const game of sortedGames) {
       const entry: Record<string, any> = { date: game.displayDate };
-      for (const player of players) {
+      for (const player of playersWithEnoughGames) {
         const result = game.results[player.id];
         if (result !== undefined) {
           cumulative[player.id] = (cumulative[player.id] || 0) + result;
           counts[player.id] = (counts[player.id] || 0) + 1;
         }
-        const avg = counts[player.id] ? cumulative[player.id] / counts[player.id] : 0;
-        entry[player.name] = avg / 100;
+        const count = counts[player.id] ?? 0;
+        const avg = count > 0 ? cumulative[player.id]! / count : undefined;
+        entry[player.name] = avg !== undefined ? avg / 100 : undefined;
       }
       data.push(entry);
     }
 
     return data;
-  }, [players, games]);
+  }, [playersWithEnoughGames, games]);
 
-  const playerNames = useMemo(() => players.map((p) => p.name), [players]);
-  const cumulativeYExtent = useMemo(() => getYExtent(cumulativeData, playerNames), [cumulativeData, playerNames]);
-  const averageYExtent = useMemo(() => getYExtent(averageData, playerNames), [averageData, playerNames]);
+  const cumulativePlayerNames = useMemo(() => players.map((p) => p.name), [players]);
+  const averagePlayerNames = useMemo(() => playersWithEnoughGames.map((p) => p.name), [playersWithEnoughGames]);
+  const cumulativeYExtent = useMemo(() => getYExtent(cumulativeData, cumulativePlayerNames), [cumulativeData, cumulativePlayerNames]);
+  const averageYExtent = useMemo(() => getYExtent(averageData, averagePlayerNames), [averageData, averagePlayerNames]);
   const cumulativeClosest = useMemo(() => {
     if (!cumulativeMouse || cumulativeChartWidth <= 0) return null;
     return getClosestPoint(
       cumulativeMouse.x,
       cumulativeMouse.y,
       cumulativeData,
-      playerNames,
+      cumulativePlayerNames,
       cumulativeChartWidth,
       LINE_CHART_HEIGHT,
       cumulativeYExtent.min,
       cumulativeYExtent.max
     );
-  }, [cumulativeMouse, cumulativeChartWidth, cumulativeData, playerNames, cumulativeYExtent]);
+  }, [cumulativeMouse, cumulativeChartWidth, cumulativeData, cumulativePlayerNames, cumulativeYExtent]);
   const averageClosest = useMemo(() => {
     if (!averageMouse || averageChartWidth <= 0) return null;
     return getClosestPoint(
       averageMouse.x,
       averageMouse.y,
       averageData,
-      playerNames,
+      averagePlayerNames,
       averageChartWidth,
       LINE_CHART_HEIGHT,
       averageYExtent.min,
       averageYExtent.max
     );
-  }, [averageMouse, averageChartWidth, averageData, playerNames, averageYExtent]);
+  }, [averageMouse, averageChartWidth, averageData, averagePlayerNames, averageYExtent]);
 
   useEffect(() => {
     setActiveLineCumulative(cumulativeClosest?.playerName ?? null);
@@ -272,7 +284,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
             <Tooltip content={() => null} />
             <Legend content={renderLegend} />
             {players.map((player, index) => {
-              const color = `hsl(${(index * 360) / players.length}, 70%, 50%)`;
+              const color = `hsl(${(index * 360) / Math.max(players.length, 1)}, 70%, 50%)`;
               const dimmed = activeLineCumulative && activeLineCumulative !== player.name;
               return (
                 <Line
@@ -311,64 +323,6 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
           </div>
           );
         })()}
-      </div>
-
-      <div className="border-t border-gray-700 pt-5">
-        <h3 className="text-lg font-semibold text-white mb-3">Average Profit/Loss Per Game</h3>
-        <div
-          ref={averageContainerRef}
-          className="relative"
-          onMouseMove={handleAverageMouseMove}
-          onMouseLeave={handleAverageMouseLeave}
-        >
-          <ResponsiveContainer width="100%" height={880}>
-            <LineChart data={averageData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} domain={['dataMin', 'dataMax']} />
-              <Tooltip content={() => null} />
-              <Legend content={renderLegend} />
-              {players.map((player, index) => {
-                const color = `hsl(${(index * 360) / players.length}, 70%, 50%)`;
-                const dimmed = activeLineAverage && activeLineAverage !== player.name;
-                return (
-                  <Line
-                    key={player.id}
-                    type="monotone"
-                    dataKey={player.name}
-                    stroke={color}
-                    strokeWidth={dimmed ? 1 : 2.5}
-                    strokeOpacity={dimmed ? 0.15 : 0.95}
-                    dot={false}
-                    activeDot={{ r: 8 }}
-                  />
-                );
-              })}
-            </LineChart>
-          </ResponsiveContainer>
-          {averageMouse && averageClosest && (() => {
-            const player = players.find((p) => p.name === averageClosest.playerName);
-            const color = player ? `hsl(${(Math.max(0, players.findIndex((p) => p.name === averageClosest.playerName)) * 360) / Math.max(players.length, 1)}, 70%, 50%)` : '#9ca3af';
-            return (
-            <div
-              className="absolute z-10 rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-200 shadow-lg"
-              style={{ left: averageMouse.x + 12, top: averageMouse.y + 12 }}
-            >
-              <div className="mb-1 text-gray-400">{averageClosest.date}</div>
-              <div className="flex items-center justify-between gap-3">
-                <span style={{ color }}>
-                  {player ? (
-                    <PlayerLink playerId={player.id}>{getFirstName(averageClosest.playerName)}</PlayerLink>
-                  ) : (
-                    getFirstName(averageClosest.playerName)
-                  )}
-                </span>
-                <span>{formatCurrency(averageClosest.value * 100)}</span>
-              </div>
-            </div>
-            );
-          })()}
-        </div>
       </div>
 
       <div className="border-t border-gray-700 pt-5 mt-6">
@@ -411,6 +365,65 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      <div className="border-t border-gray-700 pt-5 mt-6">
+        <h3 className="text-lg font-semibold text-white mb-1">Average Profit/Loss Per Game</h3>
+        <p className="text-sm text-gray-400 mb-3">Only players with 3+ games shown</p>
+        <div
+          ref={averageContainerRef}
+          className="relative"
+          onMouseMove={handleAverageMouseMove}
+          onMouseLeave={handleAverageMouseLeave}
+        >
+          <ResponsiveContainer width="100%" height={880}>
+            <LineChart data={averageData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} domain={['dataMin', 'dataMax']} />
+              <Tooltip content={() => null} />
+              <Legend content={renderLegend} />
+              {playersWithEnoughGames.map((player, index) => {
+                const color = `hsl(${(index * 360) / Math.max(playersWithEnoughGames.length, 1)}, 70%, 50%)`;
+                const dimmed = activeLineAverage && activeLineAverage !== player.name;
+                return (
+                  <Line
+                    key={player.id}
+                    type="monotone"
+                    dataKey={player.name}
+                    stroke={color}
+                    strokeWidth={dimmed ? 1 : 2.5}
+                    strokeOpacity={dimmed ? 0.15 : 0.95}
+                    dot={false}
+                    activeDot={{ r: 8 }}
+                  />
+                );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+          {averageMouse && averageClosest && (() => {
+            const player = playersWithEnoughGames.find((p) => p.name === averageClosest.playerName);
+            const color = player ? `hsl(${(Math.max(0, playersWithEnoughGames.findIndex((p) => p.name === averageClosest.playerName)) * 360) / Math.max(playersWithEnoughGames.length, 1)}, 70%, 50%)` : '#9ca3af';
+            return (
+            <div
+              className="absolute z-10 rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-200 shadow-lg"
+              style={{ left: averageMouse.x + 12, top: averageMouse.y + 12 }}
+            >
+              <div className="mb-1 text-gray-400">{averageClosest.date}</div>
+              <div className="flex items-center justify-between gap-3">
+                <span style={{ color }}>
+                  {player ? (
+                    <PlayerLink playerId={player.id}>{getFirstName(averageClosest.playerName)}</PlayerLink>
+                  ) : (
+                    getFirstName(averageClosest.playerName)
+                  )}
+                </span>
+                <span>{formatCurrency(averageClosest.value * 100)}</span>
+              </div>
+            </div>
+            );
+          })()}
+        </div>
       </div>
     </div>
   );

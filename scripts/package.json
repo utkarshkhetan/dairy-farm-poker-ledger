@@ -4,7 +4,11 @@
   "type": "module",
   "scripts": {
     "seed": "tsx seedData.ts",
-    "clear-reseed": "tsx seedData.ts"
+    "clear-reseed": "tsx seedData.ts",
+    "revert": "tsx revertUpload.ts",
+    "migrate-dates": "tsx migrateDatesToPST.ts",
+    "sync-ledger": "tsx syncFromMasterLedger.ts",
+    "verify-ledger": "tsx verifyLedgerMatch.ts"
   },
   "dependencies": {
     "firebase-admin": "^12.0.0",

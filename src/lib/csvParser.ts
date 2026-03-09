@@ -35,8 +35,7 @@ export function extractDateFromTimestamp(timestamp: string): string {
 
 /**
  * Get game date from ledger rows using GAME START time (session_start_at).
- * Uses the earliest session_start_at across all rows so we always use when the game began,
- * never session_end_at (game end).
+ * Uses the earliest session_start_at across all rows; never session_end_at (game end).
  */
 export function getGameDateFromRows(rows: UploadRow[]): string {
   const startTimestamps = rows
