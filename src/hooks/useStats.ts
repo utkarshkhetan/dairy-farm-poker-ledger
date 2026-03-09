@@ -8,7 +8,12 @@ export function useStats(players: Player[], games: Game[]) {
   }, [players, games]);
 
   const funStats = useMemo(() => {
-    return calculateFunStats(players, games);
+    try {
+      return calculateFunStats(players, games);
+    } catch (err) {
+      console.error('calculateFunStats error:', err);
+      return [];
+    }
   }, [players, games]);
 
   const lifetimeStandings = useMemo(() => {

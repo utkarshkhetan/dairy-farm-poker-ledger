@@ -1,5 +1,6 @@
 import { PlayerStats } from '../types';
 import { formatCurrency } from '../lib/statsCalculator';
+import { PlayerLink } from './PlayerLink';
 
 interface LifetimeStandingsProps {
   standings: PlayerStats[];
@@ -25,7 +26,7 @@ export function LifetimeStandings({ standings }: LifetimeStandingsProps) {
               <div className="flex items-center gap-3">
                 <span className="text-xl">{medal}</span>
                 <span className="text-sm font-semibold text-white">
-                  #{index + 1} {stat.playerName}
+                  #{index + 1} <PlayerLink playerId={stat.playerId}>{stat.playerName}</PlayerLink>
                 </span>
               </div>
               <div className="flex items-center gap-3 text-right">

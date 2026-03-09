@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Game, Player } from '../types';
-import { formatCurrency } from '../lib/statsCalculator';
+import { formatCurrency, getFirstName } from '../lib/statsCalculator';
+import { PlayerLink } from './PlayerLink';
 
 interface GameLogProps {
   games: Game[];
@@ -17,7 +18,8 @@ export function GameLog({ games, players }: GameLogProps) {
         .map(([playerId, cents]) => {
           const player = players.find(p => p.id === playerId);
           return {
-            playerName: player?.name || 'Unknown',
+            playerId,
+            playerName: getFirstName(player?.name || 'Unknown'),
             cents,
           };
         })
@@ -68,7 +70,7 @@ export function GameLog({ games, players }: GameLogProps) {
                     }`}
                   >
                     <span className="text-white font-medium">
-                      #{index + 1} {result.playerName}
+                      #{index + 1} <PlayerLink playerId={result.playerId}>{result.playerName}</PlayerLink>
                     </span>
                     <span
                       className={`font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}
@@ -95,7 +97,7 @@ export function GameLog({ games, players }: GameLogProps) {
                     }`}
                   >
                     <span className="text-white font-medium">
-                      #{displayIndex + 1} {result.playerName}
+                      #{displayIndex + 1} <PlayerLink playerId={result.playerId}>{result.playerName}</PlayerLink>
                     </span>
                     <span
                       className={`font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}

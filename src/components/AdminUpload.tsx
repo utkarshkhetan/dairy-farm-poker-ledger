@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGames, usePlayers } from '../hooks';
-import { parseUploadCSV, extractDateFromTimestamp, formatDisplayDate } from '../lib/csvParser';
+import { parseUploadCSV, getGameDateFromRows, formatDisplayDate } from '../lib/csvParser';
 import { PlayerMatcher } from './PlayerMatcher';
 import { UploadRow } from '../types';
 
@@ -66,8 +66,8 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
         return;
       }
 
-      // Extract date from first row's session_start_at timestamp
-      const gameDate = extractDateFromTimestamp(rows[0].session_start_at);
+      // Use game START time (session_start_at) only, never session_end_at
+      const gameDate = getGameDateFromRows(rows);
       const displayDate = formatDisplayDate(gameDate);
 
       // Check if game already exists

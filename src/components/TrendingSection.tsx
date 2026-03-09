@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Player, Game } from '../types';
-import { formatCurrency } from '../lib/statsCalculator';
+import { formatCurrency, getFirstName } from '../lib/statsCalculator';
+import { PlayerLink } from './PlayerLink';
 
 interface TrendingSectionProps {
   players: Player[];
@@ -83,7 +84,9 @@ export function TrendingSection({ players, games }: TrendingSectionProps) {
                 key={stat.playerId}
                 className="flex items-center justify-between p-3 bg-green-900/20 rounded-lg border border-green-800/50 transition-all duration-200 hover:-translate-y-0.5"
               >
-                <span className="text-white font-medium">{stat.playerName}</span>
+                <span className="text-white font-medium">
+                  <PlayerLink playerId={stat.playerId}>{getFirstName(stat.playerName)}</PlayerLink>
+                </span>
                 <span className="text-green-400 font-bold">
                   {formatCurrency(stat.total)}
                 </span>
@@ -104,7 +107,9 @@ export function TrendingSection({ players, games }: TrendingSectionProps) {
                 key={stat.playerId}
                 className="flex items-center justify-between p-3 bg-red-900/20 rounded-lg border border-red-800/50 transition-all duration-200 hover:-translate-y-0.5"
               >
-                <span className="text-white font-medium">{stat.playerName}</span>
+                <span className="text-white font-medium">
+                  <PlayerLink playerId={stat.playerId}>{getFirstName(stat.playerName)}</PlayerLink>
+                </span>
                 <span className="text-red-400 font-bold">
                   {formatCurrency(stat.total)}
                 </span>

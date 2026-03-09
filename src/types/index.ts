@@ -25,7 +25,6 @@ export interface PlayerStats {
   winPercentage: number; // 0-100
   standardDeviation: number;
   recentTrend: 'hot' | 'cold' | 'neutral';
-  monthlyTrend: number; // cents change this month
 }
 
 export interface FunStat {

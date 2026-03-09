@@ -128,7 +128,7 @@ export function Dashboard() {
             <ChartsSection players={players} games={games} />
           </div>
           <div className="lg:col-span-5">
-            <FunStats stats={funStats} />
+            <FunStats stats={funStats} players={players} />
           </div>
         </div>
 

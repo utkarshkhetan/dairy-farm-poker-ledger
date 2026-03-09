@@ -16,9 +16,35 @@ export function parseUploadCSV(file: File): Promise<UploadRow[]> {
   });
 }
 
+/** PST offset: UTC-8 hours in milliseconds */
+const PST_OFFSET_MS = -8 * 60 * 60 * 1000;
+
+/**
+ * Extract game date from a timestamp. Uses GAME START time only (never session_end_at).
+ * Ledger timestamps are UTC; we convert to PST (UTC-8) for the local game date.
+ */
 export function extractDateFromTimestamp(timestamp: string): string {
-  // Extract date from ISO timestamp (e.g., "2026-01-25T04:58:41.360Z" -> "2026-01-25")
-  return timestamp.split('T')[0];
+  // e.g. "2025-02-04T06:00:00.000Z" (Feb 4 6am UTC) = Feb 3 10pm PST -> use 2025-02-03
+  const date = new Date(timestamp);
+  const pstDate = new Date(date.getTime() + PST_OFFSET_MS);
+  const y = pstDate.getUTCFullYear();
+  const m = String(pstDate.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(pstDate.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Get game date from ledger rows using GAME START time (session_start_at).
+ * Uses the earliest session_start_at across all rows so we always use when the game began,
+ * never session_end_at (game end).
+ */
+export function getGameDateFromRows(rows: UploadRow[]): string {
+  const startTimestamps = rows
+    .map((r) => r.session_start_at)
+    .filter((t): t is string => !!t && t.trim() !== '');
+  if (startTimestamps.length === 0) throw new Error('No session_start_at found in ledger');
+  const earliest = startTimestamps.reduce((a, b) => (a < b ? a : b));
+  return extractDateFromTimestamp(earliest);
 }
 
 export function formatDisplayDate(dateString: string): string {
