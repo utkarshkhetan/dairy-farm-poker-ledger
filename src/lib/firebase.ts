@@ -2,13 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: 'REDACTED',
-  authDomain: 'dairy-farm-poker-ledger.firebaseapp.com',
-  projectId: 'dairy-farm-poker-ledger',
-  storageBucket: 'dairy-farm-poker-ledger.firebasestorage.app',
-  messagingSenderId: '708095680591',
-  appId: '1:708095680591:web:4905c5ad2ca2ed3679ca3a',
-  measurementId: 'G-F0FSB5HWZ5',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
