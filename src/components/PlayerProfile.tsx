@@ -247,7 +247,7 @@ export function PlayerProfile() {
               <LineChart data={cumulativeChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="date" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" tickFormatter={(v) => `$${v}`} />
+                <YAxis stroke="#9ca3af" tickFormatter={(v) => formatCurrency(v * 100)} />
                 <Tooltip
                   formatter={(value: number) => [formatCurrency(value * 100), 'Cumulative']}
                   contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}

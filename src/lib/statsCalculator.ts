@@ -564,8 +564,8 @@ export function calculateFunStats(players: Player[], games: Game[]): FunStat[] {
 
 export function formatCurrency(cents: number): string {
   const dollars = cents / 100;
-  const sign = dollars >= 0 ? '+' : '';
-  return `${sign}$${dollars.toFixed(2)}`;
+  if (dollars < 0) return `-$${Math.abs(dollars).toFixed(2)}`;
+  return `${dollars > 0 ? '+' : ''}$${dollars.toFixed(2)}`;
 }
 
 /** First word of name only; used for display everywhere except Lifetime Standings. */

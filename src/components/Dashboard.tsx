@@ -145,7 +145,7 @@ export function Dashboard() {
 
         {/* Admin (Ledger Upload) */}
         <section className="mt-8 pt-6 border-t border-gray-700 flex justify-center">
-          <AdminUpload onUploadComplete={() => {}} />
+          <AdminUpload onUploadComplete={() => window.location.reload()} />
         </section>
       </div>
     </div>

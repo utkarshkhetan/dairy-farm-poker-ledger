@@ -280,7 +280,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
           <LineChart data={cumulativeData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="date" stroke="#9ca3af" />
-            <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} domain={['dataMin', 'dataMax']} />
+            <YAxis stroke="#9ca3af" tickFormatter={(value) => formatCurrency(value * 100)} domain={['dataMin', 'dataMax']} />
             <Tooltip content={() => null} />
             <Legend content={renderLegend} />
             {players.map((player, index) => {
@@ -348,7 +348,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
           <BarChart data={playerTotalsData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="player" stroke="#9ca3af" angle={-85} textAnchor="end" height={90} interval={0} />
-            <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} />
+            <YAxis stroke="#9ca3af" tickFormatter={(value) => formatCurrency(value * 100)} />
             <Tooltip
               contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
               formatter={(value: number) => formatCurrency(value * 100)}
@@ -380,7 +380,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
             <LineChart data={averageData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="date" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} domain={['dataMin', 'dataMax']} />
+              <YAxis stroke="#9ca3af" tickFormatter={(value) => formatCurrency(value * 100)} domain={['dataMin', 'dataMax']} />
               <Tooltip content={() => null} />
               <Legend content={renderLegend} />
               {playersWithEnoughGames.map((player, index) => {
