@@ -38,7 +38,6 @@ export function calculatePlayerStats(
     playerName: player.name,
     totalWinnings,
     gamesPlayed,
-    gamesPlayedFromLedger: player.gamesPlayedFromLedger,
     averagePerGame,
     biggestWin,
     biggestLoss,

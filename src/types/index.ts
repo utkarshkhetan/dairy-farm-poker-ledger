@@ -3,7 +3,6 @@ export interface Player {
   name: string;
   playerIds: string[];
   nicknames: string[];
-  gamesPlayedFromLedger?: number; // From CSV "Num Games Played" column
 }
 
 export interface Game {
@@ -11,6 +10,8 @@ export interface Game {
   date: string; // ISO date string for sorting
   displayDate: string; // "11/20" format
   results: Record<string, number>; // playerId -> cents
+  /** PokerNow game code from ledger filename (ledger_<code>.csv) for link to pokernow.com/games/<code> */
+  pokerNowCode?: string;
 }
 
 export interface PlayerStats {
@@ -18,7 +19,6 @@ export interface PlayerStats {
   playerName: string;
   totalWinnings: number; // cents
   gamesPlayed: number;
-  gamesPlayedFromLedger?: number; // From CSV "Num Games Played" column
   averagePerGame: number; // cents
   biggestWin: number; // cents
   biggestLoss: number; // cents

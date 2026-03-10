@@ -57,6 +57,20 @@ export function PlayerProfile() {
       });
   }, [player, games]);
 
+  const averageChartData = useMemo(() => {
+    if (!player) return [];
+    const sorted = [...games].sort((a, b) => a.date.localeCompare(b.date));
+    let running = 0;
+    let count = 0;
+    return sorted
+      .filter((g) => g.results[player.id] !== undefined)
+      .map((g) => {
+        running += g.results[player.id] ?? 0;
+        count += 1;
+        return { date: g.displayDate, average: count > 0 ? running / count / 100 : 0 };
+      });
+  }, [player, games]);
+
   const streaks = useMemo(
     () => (playerId ? getPlayerStreaks(playerId, games) : { longestWinning: 0, longestLosing: 0 }),
     [playerId, games]
@@ -156,9 +170,6 @@ export function PlayerProfile() {
                 <div className="text-xs text-gray-400 mb-1">Games played</div>
                 <div className="text-lg font-bold text-white">
                   {stat.gamesPlayed}
-                  {stat.gamesPlayedFromLedger != null && stat.gamesPlayedFromLedger !== stat.gamesPlayed && (
-                    <span className="text-gray-400 text-sm ml-1">(ledger: {stat.gamesPlayedFromLedger})</span>
-                  )}
                 </div>
               </div>
               <div className="bg-gray-900/70 rounded-lg p-4 border border-gray-700">
@@ -259,6 +270,35 @@ export function PlayerProfile() {
                   strokeWidth={2}
                   dot={false}
                   name="Cumulative"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Average per game over time */}
+        {averageChartData.length > 0 && (
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
+            <h2 className="text-xl font-bold text-white mb-4">📊 Average profit/loss over time</h2>
+            <p className="text-gray-400 text-sm mb-3">
+              Running average per game after each date (how your avg has trended).
+            </p>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={averageChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9ca3af" />
+                <YAxis stroke="#9ca3af" tickFormatter={(v) => formatCurrency(v * 100)} />
+                <Tooltip
+                  formatter={(value: number) => [formatCurrency(value * 100), 'Avg per game']}
+                  contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="average"
+                  stroke="#34d399"
+                  strokeWidth={2}
+                  dot={false}
+                  name="Avg per game"
                 />
               </LineChart>
             </ResponsiveContainer>

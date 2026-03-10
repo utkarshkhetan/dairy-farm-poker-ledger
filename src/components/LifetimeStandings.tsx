@@ -36,9 +36,6 @@ export function LifetimeStandings({ standings }: LifetimeStandingsProps) {
                   </div>
                   <div className="text-[11px] text-gray-400">
                     {stat.gamesPlayed} game{stat.gamesPlayed !== 1 ? 's' : ''}
-                    {stat.gamesPlayedFromLedger !== undefined && stat.gamesPlayedFromLedger !== stat.gamesPlayed && (
-                      <span className="ml-1 opacity-75">(ledger: {stat.gamesPlayedFromLedger})</span>
-                    )}
                   </div>
                 </div>
                 <div className="min-w-[72px] text-right">

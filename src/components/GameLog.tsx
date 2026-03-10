@@ -24,6 +24,11 @@ export function GameLog({ games, players }: GameLogProps) {
     }
   }, [mostRecentDate, selectedDate]);
 
+  const gamesByDate = [...games].sort((a, b) => b.date.localeCompare(a.date)); // newest first
+  const currentIndex = selectedDate ? gamesByDate.findIndex(g => g.date === selectedDate) : -1;
+  const previousGame = currentIndex >= 0 && currentIndex < gamesByDate.length - 1 ? gamesByDate[currentIndex + 1] : null;
+  const nextGame = currentIndex > 0 ? gamesByDate[currentIndex - 1] : null;
+
   const selectedGame = games.find(g => g.date === selectedDate);
 
   const playerResults = selectedGame
@@ -47,7 +52,16 @@ export function GameLog({ games, players }: GameLogProps) {
     <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h2 className="text-xl font-bold text-white">📋 Game Log</h2>
-        <div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => previousGame && setSelectedDate(previousGame.date)}
+            disabled={!previousGame}
+            aria-label="Previous game"
+            className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-900 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
           <label htmlFor="game-select" className="sr-only">Select Game Date</label>
           <select
             id="game-select"
@@ -62,12 +76,35 @@ export function GameLog({ games, players }: GameLogProps) {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            onClick={() => nextGame && setSelectedDate(nextGame.date)}
+            disabled={!nextGame}
+            aria-label="Next game"
+            className="p-2 rounded-lg bg-gray-900 border border-gray-700 text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-900 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
 
       {selectedGame && (
         <div>
           <h3 className="text-sm font-semibold text-white mb-3">Results for {selectedGame.displayDate}</h3>
+          <div className="mb-3">
+            {selectedGame.pokerNowCode ? (
+              <a
+                href={`https://pokernow.com/games/${selectedGame.pokerNowCode}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                PokerNow Game Link
+              </a>
+            ) : (
+              <span className="text-gray-500">Game Link Not Available</span>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gray-900/70 rounded-lg p-4 border border-gray-700/70 max-h-[280px] overflow-y-auto">
             <div className="space-y-2">

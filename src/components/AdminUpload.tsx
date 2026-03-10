@@ -31,6 +31,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
   const [matchedData, setMatchedData] = useState<Record<number, { playerId: string; playerName: string; net: number }>>({});
   const [allRows, setAllRows] = useState<UploadRow[]>([]);
   const [gameDate, setGameDate] = useState<string>('');
+  const [uploadPokerNowCode, setUploadPokerNowCode] = useState<string | null>(null);
 
   const { createGame, gameExists, refresh: refreshGames } = useGames();
   const {
@@ -61,6 +62,10 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     setUploading(true);
     setError(null);
     setSuccess(false);
+
+    const match = file.name.match(/^ledger_(.+)\.csv$/i);
+    const pokerNowCodeFromFile = match ? match[1] : null;
+    setUploadPokerNowCode(pokerNowCodeFromFile);
 
     try {
       const rows = await parseUploadCSV(file);
@@ -127,7 +132,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
       }
 
       // All matched, proceed with upload
-      await processUpload(rows, matched, gameDate, displayDate);
+      await processUpload(rows, matched, gameDate, displayDate, pokerNowCodeFromFile);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process CSV');
     } finally {
@@ -139,7 +144,8 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     _rows: UploadRow[],
     matched: Record<number, { playerId: string; playerName: string; net: number }>,
     gameDate: string,
-    displayDate: string
+    displayDate: string,
+    pokerNowCode: string | null
   ) => {
     // Aggregate net values by player (handle re-buys)
     const aggregated: Record<string, number> = {};
@@ -157,6 +163,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
       date: gameDate,
       displayDate,
       results: aggregated,
+      ...(pokerNowCode ? { pokerNowCode } : {}),
     });
 
     setSuccess(true);
@@ -210,7 +217,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     // If all matched, process upload
     if (remainingUnmatched.length === 0) {
       const displayDate = formatDisplayDate(gameDate);
-      await processUpload(allRows, updatedMatched, gameDate, displayDate);
+      await processUpload(allRows, updatedMatched, gameDate, displayDate, uploadPokerNowCode);
     }
   };
 

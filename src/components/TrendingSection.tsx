@@ -27,13 +27,24 @@ export function TrendingSection({ players, games }: TrendingSectionProps) {
 
   const periodTotals = useMemo(() => {
     if (games.length === 0) return [];
-    const getGameDate = (dateStr: string) => new Date(`${dateStr.slice(0, 10)}T00:00:00`);
-    const anchorDate = games.reduce((latest, game) => {
-      const d = getGameDate(game.date);
-      return d > latest ? d : latest;
-    }, new Date('1970-01-01T00:00:00'));
-    const cutoff = new Date(anchorDate.getTime() - RANGE_DAYS[range] * 24 * 60 * 60 * 1000);
-    const periodGames = games.filter((g) => getGameDate(g.date) >= cutoff);
+    // Parse YYYY-MM-DD as UTC midnight so ranges are consistent across timezones
+    const getGameTime = (dateInput: string | unknown): number => {
+      const dateStr = typeof dateInput === 'string' ? dateInput : '';
+      const s = dateStr.slice(0, 10);
+      const parts = s.split('-').map(Number);
+      if (parts.length !== 3) return 0;
+      const [y, m, d] = parts;
+      if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d)) return 0;
+      return Date.UTC(y, m - 1, d);
+    };
+    const anchorTime = games.reduce((latest, game) => {
+      const t = getGameTime(game.date);
+      return t > latest ? t : latest;
+    }, 0);
+    if (anchorTime === 0) return [];
+    const rangeMs = RANGE_DAYS[range] * 24 * 60 * 60 * 1000;
+    const cutoffTime = anchorTime - rangeMs;
+    const periodGames = games.filter((g) => getGameTime(g.date) >= cutoffTime);
 
     return players.map((player) => {
       const total = periodGames.reduce((sum, game) => {
