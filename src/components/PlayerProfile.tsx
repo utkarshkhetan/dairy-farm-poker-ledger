@@ -492,33 +492,6 @@ export function PlayerProfile() {
           </div>
         )}
 
-        {/* Recent form */}
-        {playerGames.length > 0 && (
-          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
-            <h2 className="text-xl font-bold text-white mb-4">📋 Recent form (last 10 games)</h2>
-            <div className="space-y-2">
-              {playerGames.slice(0, 10).map(({ game, cents, position }) => (
-                <div
-                  key={game.id}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
-                    cents >= 0 ? 'bg-green-900/20 border border-green-800/50' : 'bg-red-900/20 border border-red-800/50'
-                  }`}
-                >
-                  <span className="text-gray-300">{game.displayDate}</span>
-                  <span className="text-white">
-                    {position != null && (
-                      <span className="text-gray-400 mr-2">#{position}</span>
-                    )}
-                    <span className={cents >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>
-                      {formatCurrency(cents)}
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Full game history */}
         <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700">
           <h2 className="text-xl font-bold text-white mb-4">📋 Full game history</h2>
