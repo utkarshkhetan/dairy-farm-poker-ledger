@@ -60,15 +60,15 @@ npm install
 
 ### 4. Configure Frontend (Web app config)
 
-Copy `.env.example` to `.env.local` and fill in the Web app values:
+Copy `.env.example` to `.env` and fill in the Web app values (never commit `.env`):
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Then edit `.env.local` with your `apiKey`, `messagingSenderId`, and `appId` from Firebase Console → Project Settings → General → Your apps → Web app. `projectId` and `authDomain` / `storageBucket` are pre-filled for `dairy-farm-poker-ledger`.
+Edit `.env` with your `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, and `VITE_FIREBASE_MEASUREMENT_ID` from Firebase Console → Project Settings → General → Your apps → Web app. Other `VITE_FIREBASE_*` values are pre-filled for `dairy-farm-poker-ledger`.
 
-Alternatively, edit `src/lib/firebase.ts` and replace the placeholder values.
+You need `.env` for `npm run dev` and for `npm run deploy` (the build inlines these at build time).
 
 ### 5. Firestore Security Rules
 
