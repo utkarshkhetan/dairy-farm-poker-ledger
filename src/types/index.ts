@@ -27,6 +27,19 @@ export interface PlayerStats {
   recentTrend: 'hot' | 'cold' | 'neutral';
 }
 
+/** Stat bucket for "games against X" vs "games without X" comparison. */
+export interface GamesAgainstBucket {
+  gamesPlayed: number;
+  totalWinnings: number; // cents
+  averagePerGame: number; // cents
+  winPercentage: number; // 0-100
+}
+
+export interface GamesAgainstStats {
+  gamesAgainst: GamesAgainstBucket;
+  gamesWithout: GamesAgainstBucket;
+}
+
 export interface FunStat {
   title: string;
   description: string;

@@ -23,8 +23,8 @@ export function useGames() {
         gamesData.push({ id: doc.id, ...doc.data() } as Game);
       });
       
-      // Sort by date descending (newest first)
-      gamesData.sort((a, b) => b.date.localeCompare(a.date));
+      // Sort by date descending (newest first). Coerce to string so Timestamp/other types don't break.
+      gamesData.sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')));
       
       setGames(gamesData);
       setError(null);

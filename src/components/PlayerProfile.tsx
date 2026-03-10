@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { usePlayers, useGames, useStats } from '../hooks';
-import { formatCurrency, getFirstName, getPlayerStreaks } from '../lib/statsCalculator';
+import { formatCurrency, getFirstName, getGamesAgainstVsWithout, getPlayerStreaks } from '../lib/statsCalculator';
 import { PlayerLink } from './PlayerLink';
 
 export function PlayerProfile() {
   const { playerId } = useParams<{ playerId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { players, loading: playersLoading, error: playersError } = usePlayers();
   const { games, loading: gamesLoading, error: gamesError } = useGames();
   const { lifetimeStandings, funStats, playerStats } = useStats(players, games);
@@ -93,6 +94,22 @@ export function PlayerProfile() {
   const myFunStats = useMemo(
     () => (player ? funStats.filter((f) => f.playerName === player.name) : []),
     [player, funStats]
+  );
+
+  const vsOpponentId = searchParams.get('vs');
+  const selectedOpponentId = useMemo(() => {
+    if (!vsOpponentId || !opponents.length) return null;
+    return opponents.some((p) => p.id === vsOpponentId) ? vsOpponentId : null;
+  }, [vsOpponentId, opponents]);
+
+  const againstStats = useMemo(() => {
+    if (!player || !selectedOpponentId) return null;
+    return getGamesAgainstVsWithout(player.id, selectedOpponentId, games);
+  }, [player, selectedOpponentId, games]);
+
+  const selectedOpponent = useMemo(
+    () => (selectedOpponentId ? opponents.find((p) => p.id === selectedOpponentId) : null),
+    [selectedOpponentId, opponents]
   );
 
   const loading = playersLoading || gamesLoading;
@@ -321,6 +338,157 @@ export function PlayerProfile() {
                 </PlayerLink>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* In Games Against */}
+        {opponents.length > 0 && (
+          <div className="bg-gray-800/75 rounded-xl p-5 border border-gray-700 mb-6">
+            <h2 className="text-xl font-bold text-white mb-4">🎯 In Games Against</h2>
+            <p className="text-gray-400 text-sm mb-3">
+              Compare your stats in games where a specific opponent played vs games without them.
+            </p>
+            <div className="mb-4">
+              <label htmlFor="vs-opponent" className="sr-only">
+                Select opponent to compare
+              </label>
+              <select
+                id="vs-opponent"
+                value={selectedOpponentId ?? ''}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  if (id) {
+                    setSearchParams((prev) => {
+                      const next = new URLSearchParams(prev);
+                      next.set('vs', id);
+                      return next;
+                    });
+                  } else {
+                    setSearchParams((prev) => {
+                      const next = new URLSearchParams(prev);
+                      next.delete('vs');
+                      return next;
+                    });
+                  }
+                }}
+                className="bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select opponent to compare…</option>
+                {opponents.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {againstStats && selectedOpponent && (
+              <>
+                {againstStats.gamesWithout.gamesPlayed > 0 && (
+                  <p className="text-sm text-gray-300 mb-4">
+                    You average{' '}
+                    <span
+                      className={
+                        againstStats.gamesAgainst.averagePerGame - againstStats.gamesWithout.averagePerGame >= 0
+                          ? 'text-green-400 font-bold'
+                          : 'text-red-400 font-bold'
+                      }
+                    >
+                      {formatCurrency(
+                        Math.round(
+                          againstStats.gamesAgainst.averagePerGame - againstStats.gamesWithout.averagePerGame
+                        )
+                      )}
+                    </span>{' '}
+                    {againstStats.gamesAgainst.averagePerGame >= againstStats.gamesWithout.averagePerGame
+                      ? 'more'
+                      : 'less'}{' '}
+                    per game when {getFirstName(selectedOpponent.name)} is at the table.
+                  </p>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-900/70 rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-400 mb-3">
+                      Vs {getFirstName(selectedOpponent.name)}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-500">Games</span>
+                        <div className="text-white font-medium">{againstStats.gamesAgainst.gamesPlayed}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Total</span>
+                        <div
+                          className={`font-medium ${
+                            againstStats.gamesAgainst.totalWinnings >= 0 ? 'text-green-400' : 'text-red-400'
+                          }`}
+                        >
+                          {formatCurrency(againstStats.gamesAgainst.totalWinnings)}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Avg/game</span>
+                        <div
+                          className={`font-medium ${
+                            againstStats.gamesAgainst.averagePerGame >= 0 ? 'text-green-400' : 'text-red-400'
+                          }`}
+                        >
+                          {formatCurrency(Math.round(againstStats.gamesAgainst.averagePerGame))}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Win %</span>
+                        <div className="text-white font-medium">
+                          {againstStats.gamesAgainst.winPercentage.toFixed(1)}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-900/70 rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-400 mb-3">
+                      Without {getFirstName(selectedOpponent.name)}
+                    </h3>
+                    {againstStats.gamesWithout.gamesPlayed === 0 ? (
+                      <p className="text-gray-500 text-sm">
+                        No games without {getFirstName(selectedOpponent.name)} in your history.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-500">Games</span>
+                          <div className="text-white font-medium">{againstStats.gamesWithout.gamesPlayed}</div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Total</span>
+                          <div
+                            className={`font-medium ${
+                              againstStats.gamesWithout.totalWinnings >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}
+                          >
+                            {formatCurrency(againstStats.gamesWithout.totalWinnings)}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Avg/game</span>
+                          <div
+                            className={`font-medium ${
+                              againstStats.gamesWithout.averagePerGame >= 0 ? 'text-green-400' : 'text-red-400'
+                            }`}
+                          >
+                            {formatCurrency(Math.round(againstStats.gamesWithout.averagePerGame))}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Win %</span>
+                          <div className="text-white font-medium">
+                            {againstStats.gamesWithout.winPercentage.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 

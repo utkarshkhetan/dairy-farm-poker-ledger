@@ -11,15 +11,15 @@ interface TrendingSectionProps {
 type TrendRange = 'week' | 'month' | 'quarter';
 
 const RANGE_LABELS: Record<TrendRange, string> = {
-  week: 'Last 7 days',
-  month: 'Last 30 days',
-  quarter: 'Last 90 days',
+  week: 'Last 5 games',
+  month: 'Last 10 games',
+  quarter: 'Last 20 games',
 };
 
-const RANGE_DAYS: Record<TrendRange, number> = {
-  week: 7,
-  month: 30,
-  quarter: 90,
+const RANGE_GAMES: Record<TrendRange, number> = {
+  week: 5,
+  month: 10,
+  quarter: 20,
 };
 
 export function TrendingSection({ players, games }: TrendingSectionProps) {
@@ -27,53 +27,9 @@ export function TrendingSection({ players, games }: TrendingSectionProps) {
 
   const periodTotals = useMemo(() => {
     if (games.length === 0) return [];
-    // Normalize any game date (string YYYY-MM-DD, Firestore Timestamp, or number) to UTC midnight timestamp
-    const getGameTime = (dateInput: unknown): number => {
-      if (dateInput == null) return 0;
-      // Firestore Timestamp: { seconds, nanoseconds } or .toDate()
-      const ts = dateInput as { seconds?: number; nanoseconds?: number; toDate?: () => Date };
-      if (typeof ts.seconds === 'number') {
-        const d = new Date(ts.seconds * 1000);
-        return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-      }
-      if (typeof ts.toDate === 'function') {
-        const d = ts.toDate();
-        return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-      }
-      // Number (milliseconds)
-      if (typeof dateInput === 'number') {
-        const d = new Date(dateInput);
-        return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-      }
-      // String: YYYY-MM-DD
-      const dateStr = String(dateInput).trim();
-      const isoMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-      if (isoMatch) {
-        const [, y, m, d] = isoMatch.map(Number);
-        if (!Number.isNaN(y) && !Number.isNaN(m) && !Number.isNaN(d))
-          return Date.UTC(y, m - 1, d);
-      }
-      // String: M/D or M/D/YYYY (e.g. from displayDate or legacy)
-      const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/);
-      if (slashMatch) {
-        const [, m, d, yStr] = slashMatch;
-        const month = Number(m);
-        const day = Number(d);
-        const year = yStr ? Number(yStr) : new Date().getUTCFullYear();
-        if (!Number.isNaN(month) && !Number.isNaN(day) && !Number.isNaN(year))
-          return Date.UTC(year, month - 1, day);
-      }
-      return 0;
-    };
-    // Use "today" (UTC) as end of window so last 7/30/90 days include all games in that period
-    const now = new Date();
-    const anchorTime = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) + 24 * 60 * 60 * 1000;
-    const rangeMs = RANGE_DAYS[range] * 24 * 60 * 60 * 1000;
-    const cutoffTime = anchorTime - rangeMs;
-    const periodGames = games.filter((g) => {
-      const t = getGameTime(g.date);
-      return t > 0 && t >= cutoffTime && t < anchorTime;
-    });
+    // useGames already returns games sorted by date descending (newest first)
+    const n = RANGE_GAMES[range];
+    const periodGames = games.slice(0, n);
 
     return players.map((player) => {
       const total = periodGames.reduce((sum, game) => {

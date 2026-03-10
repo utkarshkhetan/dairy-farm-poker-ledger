@@ -1,4 +1,4 @@
-import { Player, Game, PlayerStats, FunStat } from '../types';
+import { Player, Game, PlayerStats, FunStat, GamesAgainstStats, GamesAgainstBucket } from '../types';
 
 export function calculatePlayerStats(
   player: Player,
@@ -74,6 +74,37 @@ export function getPlayerStreaks(
     }
   }
   return { longestWinning, longestLosing };
+}
+
+function bucketFromResults(results: number[]): GamesAgainstBucket {
+  const gamesPlayed = results.length;
+  const totalWinnings = results.reduce((sum, val) => sum + val, 0);
+  const averagePerGame = gamesPlayed > 0 ? totalWinnings / gamesPlayed : 0;
+  const wins = results.filter((r) => r > 0).length;
+  const winPercentage = gamesPlayed > 0 ? (wins / gamesPlayed) * 100 : 0;
+  return { gamesPlayed, totalWinnings, averagePerGame, winPercentage };
+}
+
+/**
+ * Returns the focal player's stats in games where the opponent played vs games where they did not.
+ */
+export function getGamesAgainstVsWithout(
+  playerId: string,
+  opponentId: string,
+  games: Game[]
+): GamesAgainstStats {
+  const gamesAgainst = games.filter(
+    (g) => g.results[playerId] !== undefined && g.results[opponentId] !== undefined
+  );
+  const gamesWithout = games.filter(
+    (g) => g.results[playerId] !== undefined && g.results[opponentId] === undefined
+  );
+  const resultsAgainst = gamesAgainst.map((g) => g.results[playerId] ?? 0);
+  const resultsWithout = gamesWithout.map((g) => g.results[playerId] ?? 0);
+  return {
+    gamesAgainst: bucketFromResults(resultsAgainst),
+    gamesWithout: bucketFromResults(resultsWithout),
+  };
 }
 
 /** Min games for "meaningful" totals (Whale, Shark, single-game stats, etc.). */
