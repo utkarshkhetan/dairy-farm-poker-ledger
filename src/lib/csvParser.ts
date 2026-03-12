@@ -52,13 +52,22 @@ export function formatDisplayDate(dateString: string): string {
   return `${m}/${d}`;
 }
 
+/**
+ * Parse ledger net value from CSV (supports integer or decimal format).
+ * Returns integer cents for DB consistency; invalid/empty string → 0.
+ */
+export function parseLedgerNet(value: string): number {
+  const n = parseFloat(value);
+  return Number.isNaN(n) ? 0 : Math.round(n);
+}
+
 export function aggregateNetByPlayer(rows: UploadRow[]): Record<string, number> {
   // Sum net values for players who appear multiple times (re-buys)
   const aggregated: Record<string, number> = {};
   
   for (const row of rows) {
     const playerId = row.player_id;
-    const net = parseInt(row.net, 10) || 0;
+    const net = parseLedgerNet(row.net);
     
     if (aggregated[playerId]) {
       aggregated[playerId] += net;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGames, usePlayers, useVisits } from '../hooks';
-import { parseUploadCSV, getGameDateFromRows, formatDisplayDate } from '../lib/csvParser';
+import { parseUploadCSV, getGameDateFromRows, formatDisplayDate, parseLedgerNet } from '../lib/csvParser';
 import { PlayerMatcher } from './PlayerMatcher';
 import { UploadRow } from '../types';
 
@@ -113,7 +113,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
           matched[i] = {
             playerId: matchedPlayer.id,
             playerName: matchedPlayer.name,
-            net: parseInt(row.net, 10) || 0,
+            net: parseLedgerNet(row.net),
           };
         } else {
           unmatched.push({ row, index: i });
@@ -193,7 +193,7 @@ export function AdminUpload({ onUploadComplete }: AdminUploadProps) {
     if (!row) return;
 
     // Update matched data
-    const net = parseInt(row.net, 10) || 0;
+    const net = parseLedgerNet(row.net);
     const updatedMatched = {
       ...matchedData,
       [rowIndex]: { playerId, playerName, net },

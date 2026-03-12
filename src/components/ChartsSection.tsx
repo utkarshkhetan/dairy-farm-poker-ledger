@@ -83,14 +83,13 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
   const navigate = useNavigate();
   const [activeLineCumulative, setActiveLineCumulative] = useState<string | null>(null);
   const [activeLineAverage, setActiveLineAverage] = useState<string | null>(null);
-  const [barRange, setBarRange] = useState<'week' | 'month' | 'quarter'>('quarter');
+  const [barRange, setBarRange] = useState<'games5' | 'games10' | 'games20'>('games20');
   const [cumulativeChartWidth, setCumulativeChartWidth] = useState(0);
   const [averageChartWidth, setAverageChartWidth] = useState(0);
   const [cumulativeMouse, setCumulativeMouse] = useState<{ x: number; y: number } | null>(null);
   const [averageMouse, setAverageMouse] = useState<{ x: number; y: number } | null>(null);
   const cumulativeContainerRef = useRef<HTMLDivElement>(null);
   const averageContainerRef = useRef<HTMLDivElement>(null);
-  const getGameDate = (dateStr: string) => new Date(`${dateStr.slice(0, 10)}T00:00:00`);
 
   const playersWithEnoughGames = useMemo(() => {
     const gameCount: Record<string, number> = {};
@@ -215,16 +214,16 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
     setActiveLineAverage(averageClosest?.playerName ?? null);
   }, [averageClosest?.playerName]);
 
-  const barRangeDays: Record<'week' | 'month' | 'quarter', number> = {
-    week: 7,
-    month: 30,
-    quarter: 90,
+  const barRangeGameCounts: Record<'games5' | 'games10' | 'games20', number> = {
+    games5: 5,
+    games10: 10,
+    games20: 20,
   };
 
-  const barRangeLabels: Record<'week' | 'month' | 'quarter', string> = {
-    week: 'Last 7 days',
-    month: 'Last 30 days',
-    quarter: 'Last 90 days',
+  const barRangeLabels: Record<'games5' | 'games10' | 'games20', string> = {
+    games5: 'Last 5 games',
+    games10: 'Last 10 games',
+    games20: 'Last 20 games',
   };
 
   const renderLegend = useCallback(
@@ -251,12 +250,9 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
 
   const playerTotalsData = useMemo(() => {
     if (games.length === 0) return [];
-    const anchorDate = games.reduce((latest, game) => {
-      const d = getGameDate(game.date);
-      return d > latest ? d : latest;
-    }, new Date('1970-01-01T00:00:00'));
-    const cutoff = new Date(anchorDate.getTime() - barRangeDays[barRange] * 24 * 60 * 60 * 1000);
-    const periodGames = games.filter((g) => getGameDate(g.date) >= cutoff);
+    const sortedGames = [...games].sort((a, b) => b.date.localeCompare(a.date)); // most recent first
+    const n = barRangeGameCounts[barRange];
+    const periodGames = sortedGames.slice(0, n);
 
     return players.map((player) => {
       const total = periodGames.reduce((sum, game) => {
@@ -329,7 +325,7 @@ export function ChartsSection({ players, games }: ChartsSectionProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <h3 className="text-lg font-semibold text-white">Player Win/Loss Totals</h3>
           <div className="flex items-center gap-2 text-xs">
-            {(['week', 'month', 'quarter'] as const).map((option) => (
+            {(['games5', 'games10', 'games20'] as const).map((option) => (
               <button
                 key={option}
                 onClick={() => setBarRange(option)}
